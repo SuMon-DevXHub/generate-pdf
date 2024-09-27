@@ -2,21 +2,17 @@ const express = require("express");
 const app = express();
 require("dotenv").config();
 const cors = require("cors");
-const path = require("path");
 const bodyParser = require("body-parser");
 
 let puppeteer;
 let executablePath;
 
-app.use(
-  cors({
-    origin: "*", // Allow all origins
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Allow common HTTP methods
-    allowedHeaders: ["Content-Type", "Authorization"], // Specify allowed headers
-  })
-);
+app.use(cors()); // Allow all origins
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+// Handle preflight requests for CORS
+app.options("*", cors()); // Handle CORS for all routes
 
 const port = process.env.PORT || 5000;
 
@@ -48,7 +44,6 @@ async function initializePuppeteer() {
 
 // PDF generation route
 app.post("/generate-pdf", async (req, res) => {
-  // Initialize Puppeteer
   await initializePuppeteer();
 
   const { html } = req.body;
@@ -63,9 +58,7 @@ app.post("/generate-pdf", async (req, res) => {
 
   try {
     browser = await puppeteer.launch({
-      args: process.env.AWS_EXECUTION_ENV
-        ? []
-        : ["--no-sandbox", "--disable-setuid-sandbox"], // Adjust args based on environment
+      args: ["--no-sandbox", "--disable-setuid-sandbox"], // Adjust args based on environment
       defaultViewport: null,
       executablePath, // Will use the correct path based on the environment
       ignoreHTTPSErrors: true,
@@ -94,16 +87,16 @@ app.post("/generate-pdf", async (req, res) => {
       { waitUntil: "networkidle0" }
     );
 
-    await page.addStyleTag({
-      content: `
-      body {
-          -webkit-print-color-adjust: exact;
-          print-color-adjust: exact;
-        }
-      `,
-    });
+    // await page.addStyleTag({
+    //   content: `
+    //   body {
+    //       -webkit-print-color-adjust: exact;
+    //       print-color-adjust: exact;
+    //     }
+    //   `,
+    // });
 
-    // await page.emulateMediaType("screen");
+    // // await page.emulateMediaType("screen");
 
     const pdf = await page.pdf({
       format: "A4",
