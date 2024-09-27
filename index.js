@@ -18,7 +18,7 @@ const port = process.env.PORT || 5000;
 
 const { MongoClient, ServerApiVersion } = require("mongodb");
 
-const uri = `${process.env.DATABASE_URL}`;
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_USER}@cluster0.pqw80zr.mongodb.net/generate-pdf?retryWrites=true&w=majority&appName=Cluster0`;
 const client = new MongoClient(uri, {
   serverApi: ServerApiVersion.v1,
 });
@@ -87,16 +87,16 @@ app.post("/generate-pdf", async (req, res) => {
       { waitUntil: "networkidle0" }
     );
 
-    // await page.addStyleTag({
-    //   content: `
-    //   body {
-    //       -webkit-print-color-adjust: exact;
-    //       print-color-adjust: exact;
-    //     }
-    //   `,
-    // });
+    await page.addStyleTag({
+      content: `
+      body {
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
+      `,
+    });
 
-    // // await page.emulateMediaType("screen");
+    // await page.emulateMediaType("screen");
 
     const pdf = await page.pdf({
       format: "A4",
