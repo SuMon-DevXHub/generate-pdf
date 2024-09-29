@@ -18,18 +18,8 @@ const port = process.env.PORT || 5000;
 
 const { MongoClient, ServerApiVersion } = require("mongodb");
 
-const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_USER}@cluster0.pqw80zr.mongodb.net/generate-pdf?retryWrites=true&w=majority&appName=Cluster0`;
-const client = new MongoClient(uri, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  serverApi: ServerApiVersion.v1,
-});
-
 const run = async () => {
   try {
-    const dataBase = await client.db("generate-pdf");
-    console.log(dataBase, "database connected");
-
     // Initialize Puppeteer function
     async function initializePuppeteer() {
       puppeteer = await import("puppeteer");
@@ -71,6 +61,14 @@ const run = async () => {
               print-color-adjust: exact;
               padding: 20px;
             }
+            table > tbody > tr > td[style="line-height:1.2;padding:0.01px 0.01px 12px"] > div {
+              display: flex;
+              flex-wrap: nowrap;
+            }
+            table > tbody > tr > td > div > font[face="arial, sans-serif"]{
+              display: flex;
+              flex-wrap: nowrap;
+            }
           </style>
         </head>
         <body>
@@ -91,7 +89,6 @@ const run = async () => {
         });
 
         // await page.emulateMediaType("screen");
-
         const pdf = await page.pdf({
           format: "A4",
           printBackground: true,
@@ -119,7 +116,7 @@ const run = async () => {
 };
 
 app.get("/", (req, res) => {
-  res.send("Hello World!");
+  res.send("Hello Generate PDF is running successfully!");
 });
 
 run().catch(console.dir);
