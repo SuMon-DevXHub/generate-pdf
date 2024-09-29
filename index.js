@@ -16,8 +16,6 @@ app.options("*", cors()); // Handle CORS for all routes
 
 const port = process.env.PORT || 5000;
 
-const { MongoClient, ServerApiVersion } = require("mongodb");
-
 const run = async () => {
   try {
     // Initialize Puppeteer function
